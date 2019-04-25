@@ -13,6 +13,6 @@ module.exports = function(pRequest, pResponse){
         let file = fs.readFileSync(filename, "binary");
         pResponse.writeHead(200);
         pResponse.write(file, "binary");
-        pResponse.end();
+        pResponse.realEnd();
     }
 };

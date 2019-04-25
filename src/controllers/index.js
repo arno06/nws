@@ -7,6 +7,7 @@ module.exports = {
         t.render(pResponse);
     },
     bouboup:function(pRequest, pResponse){
+        console.log("there");
         var t = new Template('bouboup.tpl');
         t.assign('test', 'bouboup');
         t.render(pResponse);

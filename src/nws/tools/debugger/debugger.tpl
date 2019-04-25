@@ -1,7 +1,7 @@
 <div id="debug">
 	<div class="debug_bar">
 		<div class="debug_global">
-			<span class="debug_time">2.00sec</span>
+			<span class="debug_time">{$timeToGenerate}ms</span>
 			<span class="debug_memory">1Mo</span>
 		</div>
 		<div class="debug_control">

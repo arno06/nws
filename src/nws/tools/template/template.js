@@ -9,15 +9,8 @@ class Template
         this._c = {};
         this._functions = Template.FUNCTIONS||{};
 
-        let filename = path.join(process.cwd(), 'views', pFile);
-        if(!fs.existsSync(filename)){
-            throw new Error('Template file not found');
-        }
-        let stats = fs.statSync(filename);
-        if(!stats.isFile()){
-            throw new Error('Template file not found');
-        }
-        this.raw = fs.readFileSync(filename, 'utf8');
+        this.file = pFile;
+        this.setupFolder(process.cwd(), 'views');
     }
 
     assign(pName, pValue)
@@ -30,20 +23,45 @@ class Template
         this._functions[pName] = pFunction;
     }
 
+    setupFolder(){
+        let args = Array.from(arguments);
+        if(args.length==0){
+            args= [process.cwd(), 'views'];
+        }
+        args.push(this.file);
+
+        this.filename = path.join(...args);
+    }
+
+    loadFile(){
+        if(!fs.existsSync(this.filename)){
+            throw new Error('Template file not found');
+        }
+        let stats = fs.statSync(this.filename);
+        if(!stats.isFile()){
+            throw new Error('Template file not found');
+        }
+        this.raw = fs.readFileSync(this.filename, 'utf8');
+        return true;
+    }
+
     render(pResponse){
-        if(!this.raw || this.raw === ""){
-            pResponse.writeHead(404);
-            pResponse.write("Resource not found");
-            pResponse.end();
+        let result = this.evaluate();
+        if(result === false){
             return;
         }
         pResponse.writeHead(200);
-        pResponse.write(this.evaluate());
+        pResponse.write(this.evaluate(), 'utf8');
         pResponse.end();
     }
 
     evaluate()
     {
+        if(!this.raw || this.raw === ""){
+            if(!this.loadFile()){
+                return false;
+            }
+        }
         this._c = JSON.parse(JSON.stringify(this._content));
         let start = new Date().getTime();
         let t = this.raw;
