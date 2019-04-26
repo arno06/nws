@@ -1,13 +1,14 @@
 var http = require('http');
 var router = require('./middlewares/router').middleware;
-var debug = require('./tools/debugger/debugger').middleware;
+var debugMdlware = require('./tools/debugger/debugger').middleware;
+var errorHandler = require('./tools/debugger/debugger').errorHandler;
 
 class NWS{
 
     constructor(){
         this.running = false;
         this.port = 1234;
-        this.stack = [debug];
+        this.stack = [debugMdlware];
     }
 
     middleware(pMiddleware){
@@ -26,16 +27,21 @@ class NWS{
         var ref = this;
         this.running = true;
         http.createServer(function(pRequest, pResponse){
-            for(let i = 0, max = ref.stack.length; i<max; i++){
-                ref.stack[i](pRequest, pResponse);
-                if(pResponse.finished){
-                    return;
+            try{
+                for(let i = 0, max = ref.stack.length; i<max; i++){
+                    ref.stack[i](pRequest, pResponse);
+                    if(pResponse.finished){
+                        return;
+                    }
+                }
+                if(!pResponse.finished){
+                    pResponse.writeHead(404);
+                    pResponse.write("Page not found");
+                    pResponse.end();
                 }
             }
-            if(!pResponse.finished){
-                pResponse.writeHead(404);
-                pResponse.write("Page not found");
-                pResponse.end();
+            catch(e){
+                errorHandler(e);
             }
         }).listen(this.port);
     }
