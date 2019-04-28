@@ -48,13 +48,13 @@ If no route matches, the app sends back a 404 response
 
 Todo
 ----
-  * [/] Keep things simple
+  * [ ] WIP - Keep things simple
   * [x] Running server
   * [x] Middleware architecture implementation
   * [x] Static file middleware
   * [x] Templating - server implementation of [Template](https://github.com/arno06/Template/)
-  * [/] Debugger - Similar to the one from [php-fw](https://github.com/arno06/php-fw/)
-  * [/] Dynamic url parameters (`/some/route/{$with}/{$parameters}`)
+  * [ ] WIP - Debugger - Similar to the one from [php-fw](https://github.com/arno06/php-fw/)
+  * [ ] WIP - Dynamic url parameters (`/some/route/{$with}/{$parameters}`)
   * [ ] Performance audit
   * [ ] Stabilize working tree
   * [ ] Databases handler
