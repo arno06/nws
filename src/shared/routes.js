@@ -1,8 +1,21 @@
 module.exports = {
     "/":{
-        "get":"controllers/index.index"
+        "get":"index.index"
     },
     "/bouboup":{
-        "get":"controllers/index.bouboup"
+        "get":"index.bouboup"
+    },
+    "/back/{$module}":{
+        "parameters":{
+            "module":"[a-zA-Z-_]+"
+        },
+        "*":"back/{$module}.index"
+    },
+    "/back/{$module}/{$method}":{
+        "parameters":{
+            "module":"[a-zA-Z-_]+",
+            "method":"[a-zA-Z_]+"
+        },
+        "*":"back/{$module}.{$method}"
     }
 };
