@@ -7,14 +7,14 @@ module.exports = {
     },
     "/back/{$module}":{
         "parameters":{
-            "module":"[a-zA-Z-_]+"
+            "module":"[a-zA-Z]+"
         },
         "*":"back/{$module}.index"
     },
     "/back/{$module}/{$method}":{
         "parameters":{
-            "module":"[a-zA-Z-_]+",
-            "method":"[a-zA-Z_]+"
+            "module":"[a-zA-Z]+",
+            "method":"[a-zA-Z]+"
         },
         "*":"back/{$module}.{$method}"
     }
