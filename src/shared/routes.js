@@ -1,9 +1,9 @@
 module.exports = {
     "/":{
-        "get":"index.index"
+        "GET":"index.index"
     },
     "/bouboup":{
-        "get":"index.bouboup"
+        "GET":"index.bouboup"
     },
     "/back/{$module}":{
         "parameters":{
