@@ -1,4 +1,8 @@
 module.exports = {
     debug:true,
-    not_found:''
+    not_found:'',
+    middlewares:[
+        './middlewares/debugger',
+        './middlewares/static'
+    ]
 };

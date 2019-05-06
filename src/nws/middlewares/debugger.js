@@ -91,7 +91,7 @@ module.exports = {
             console[pMethod] = function(){
                 let e = pMethod==="error"&&typeof arguments[0]!=="string"?arguments[0]:null;
                 let f = getStackFile(e);
-                if(f.indexOf("console.js:")===-1){
+                if(f.indexOf("console.js:")===-1&&f.indexOf("/console/constructor.js")===-1){//internal callings (ie : console.table calling console.log)
                     let arg = Array.from(arguments);
                     let d = new Date();
                     d = ("0"+d.getHours()).slice(-2)+":"+ ("0"+d.getMinutes()).slice(-2)+":"+ ("0"+d.getSeconds()).slice(-2)+"."+ d.getMilliseconds();

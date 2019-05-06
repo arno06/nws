@@ -1,14 +1,14 @@
 var http = require('http');
 var router = require('./middlewares/router').middleware;
-var debugMdlware = require('./tools/debugger/debugger').middleware;
-var errorHandler = require('./tools/debugger/debugger').errorHandler;
+var config = require(process.cwd()+'/shared/config');
+var errorHandler = require('./middlewares/debugger').errorHandler;
 
 class NWS{
 
     constructor(){
         this.running = false;
         this.port = 1234;
-        this.stack = [debugMdlware];
+        this.stack = config.middlewares.map((pModule)=> require(pModule).middleware);
     }
 
     middleware(pMiddleware){
