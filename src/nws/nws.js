@@ -41,6 +41,7 @@ class NWS{
                 }
             }
             catch(e){
+                console.error(e);
                 errorHandler(e);
             }
         }).listen(this.port);

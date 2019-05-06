@@ -50,6 +50,7 @@ class Template
         if(result === false){
             return;
         }
+        pResponse.setHeader("Content-Type", "text/html;charset=UTF-8");
         pResponse.writeHead(200);
         pResponse.write(this.evaluate(), 'utf8');
         pResponse.end();

@@ -53,7 +53,7 @@ Todo
   * [x] Middleware architecture implementation
   * [x] Static file middleware
   * [x] Templating - server implementation of [Template](https://github.com/arno06/Template/)
-  * [ ] WIP - Debugger - Similar to the one from [php-fw](https://github.com/arno06/php-fw/)
+  * [x] Debugger - ~~Similar to the one from [php-fw](https://github.com/arno06/php-fw/)~~ Based upon browser's console
   * [x] Dynamic url parameters (`/some/route/{$with}/{$parameters}`)
   * [ ] Performance audit
   * [ ] Stabilize working tree
