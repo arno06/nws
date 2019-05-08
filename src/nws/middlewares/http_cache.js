@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-let cacheDuration = 120 * 1000;
+let cacheDuration = 120;
 
 function getEtag(pUrl){
     return '"'+crypto.createHash('sha1').update(pUrl).digest('hex')+'"';
@@ -14,7 +14,7 @@ module.exports = {
             return;
         }
         let eTag = getEtag(pRequest.url);
-        let time = Date.parse(ifModifiedSince) + cacheDuration;
+        let time = Date.parse(ifModifiedSince) + (cacheDuration * 1000);
 
         if(eTag !== ifNoneMatch || (new Date()).getTime() > time){
             return;
@@ -28,7 +28,7 @@ module.exports = {
         pResponse.setHeader("eTag", getEtag(pRequest.url));
         let now = new Date();
         let expires = new Date();
-        expires.setTime(expires.getTime() + (cacheDuration));
+        expires.setTime(expires.getTime() + (cacheDuration * 1000));
         pResponse.setHeader("Last-Modified", now.toUTCString());
         pResponse.setHeader("Expires", expires.toUTCString())
     },
