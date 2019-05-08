@@ -1,16 +1,12 @@
-const path = require('path');
-const fs = require('fs');
-
-class Template
+class BaseTemplate
 {
-    constructor(pFile, pContent)
+    constructor(pName, pContent)
     {
         this._content = pContent||{};
         this._c = {};
-        this._functions = Template.FUNCTIONS||{};
-
-        this.file = pFile;
-        this.setupFolder(process.cwd(), 'views');
+        this._functions = BaseTemplate.FUNCTIONS||{};
+        this.raw = "";
+        this.name = pName;
     }
 
     assign(pName, pValue)
@@ -23,43 +19,14 @@ class Template
         this._functions[pName] = pFunction;
     }
 
-    setupFolder(){
-        let args = Array.from(arguments);
-        if(args.length==0){
-            args= [process.cwd(), 'views'];
-        }
-        args.push(this.file);
-
-        this.filename = path.join(...args);
-    }
-
-    loadFile(){
-        if(!fs.existsSync(this.filename)){
-            throw new Error('Template file not found');
-        }
-        let stats = fs.statSync(this.filename);
-        if(!stats.isFile()){
-            throw new Error('Template file not found');
-        }
-        this.raw = fs.readFileSync(this.filename, 'utf8');
-        return true;
-    }
-
-    render(pResponse){
-        let result = this.evaluate();
-        if(result === false){
-            return;
-        }
-        pResponse.setHeader("Content-Type", "text/html;charset=UTF-8");
-        pResponse.writeHead(200);
-        pResponse.write(this.evaluate(), 'utf8');
-        pResponse.end();
+    loadTemplate(){
+        return false;
     }
 
     evaluate()
     {
         if(!this.raw || this.raw === ""){
-            if(!this.loadFile()){
+            if(!this.loadTemplate()){
                 return false;
             }
         }
@@ -69,8 +36,8 @@ class Template
         if(!t)
             return "";
 
-        let t0 = Template.TAG[0];
-        let t1 = Template.TAG[1];
+        let t0 = BaseTemplate.TAG[0];
+        let t1 = BaseTemplate.TAG[1];
 
         let re_blocs = new RegExp("(\\"+t0+"[a-z]+|\\"+t0+"\/[a-z]+)(\\s|\\"+t1+"){1}", "gi");
 
@@ -113,8 +80,8 @@ class Template
 
     _parseBlock(pString, pData)
     {
-        let t_0 = Template.TAG[0];
-        let t_1 = Template.TAG[1];
+        let t_0 = BaseTemplate.TAG[0];
+        let t_1 = BaseTemplate.TAG[1];
 
         //{opener_X}
         let opener = new RegExp('\\'+t_0+'([a-z]+)(_[0-9]+)([^\}]*)\\'+t_1, 'i');
@@ -206,10 +173,10 @@ class Template
             pString = pString.replace(totalBlock, r);
         }
 
-        pString = this._parseVariables(pString, pData, Template.REGEXP_VAR);
+        pString = this._parseVariables(pString, pData, BaseTemplate.REGEXP_VAR);
 
         let func;
-        while(func = Template.REGEXP_FUNC.exec(pString))
+        while(func = BaseTemplate.REGEXP_FUNC.exec(pString))
         {
             let funcName = func[1];
             let p = [];
@@ -243,7 +210,7 @@ class Template
     _parseVariables(pString, pData, pREGEXP, pEscapeString)
     {
         pEscapeString = pEscapeString||false;
-        pREGEXP = pREGEXP||Template.REGEXP_ID;
+        pREGEXP = pREGEXP||BaseTemplate.REGEXP_ID;
         let res;
         while(res = pREGEXP.exec(pString))
         {
@@ -259,7 +226,7 @@ class Template
     {
         let default_value = "";
         let data = pContext||this._c;
-        let result = Template.REGEXP_ID.exec(pName);
+        let result = BaseTemplate.REGEXP_ID.exec(pName);
 
         if(!result)
             return default_value;
@@ -279,14 +246,14 @@ class Template
     }
 }
 
-Template.TAG = ["{", "}"];
-Template.REGEXP_FUNC = new RegExp("\\"+Template.TAG[0]+"\\=([^(]+)\\(([^"+Template.TAG[1]+"]+)\\)\\"+Template.TAG[1], "i");
-Template.REGEXP_VAR = new RegExp("\\"+Template.TAG[0]+"\\$([a-z0-9\.\_\-]+)*\\"+Template.TAG[1], "i");
-Template.REGEXP_ID = new RegExp("([a-z0-9\.\_\-]+)", "i");
+BaseTemplate.TAG = ["{", "}"];
+BaseTemplate.REGEXP_FUNC = new RegExp("\\"+BaseTemplate.TAG[0]+"\\=([^(]+)\\(([^"+BaseTemplate.TAG[1]+"]+)\\)\\"+BaseTemplate.TAG[1], "i");
+BaseTemplate.REGEXP_VAR = new RegExp("\\"+BaseTemplate.TAG[0]+"\\$([a-z0-9\.\_\-]+)*\\"+BaseTemplate.TAG[1], "i");
+BaseTemplate.REGEXP_ID = new RegExp("([a-z0-9\.\_\-]+)", "i");
 
-Template.$ = {};
+BaseTemplate.$ = {};
 
-Template.FUNCTIONS =
+BaseTemplate.FUNCTIONS =
 {
     truncate:function(pString, pLength, pEnd)
     {
@@ -319,21 +286,9 @@ Template.FUNCTIONS =
             result+=Number(arguments[i]);
         }
         return result;
-    },
-    include:function(pTpl)
-    {
-        let last = arguments.length-1;
-        let vars = arguments[last];
-        for(let i = 1;i<last;i++)
-        {
-            let v = arguments[i].split('=');
-            if(v.length!=2)
-                continue;
-            vars[v[0]] = v[1].replace(/"/g, '').replace(/'/g, '');
-        }
-        let t = new Template(pTpl, vars);
-        return t.evaluate();
     }
 };
 
-module.exports = Template;
+if(module){
+    module.exports = BaseTemplate;
+}

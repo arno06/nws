@@ -58,6 +58,11 @@ module.exports = {
         lastResponse = pResponse;
         pResponse.realEnd = pResponse.end;
         pResponse.end = function(){
+            let type = this.getHeader("Content-Type")?this.getHeader("Content-Type").toLowerCase():"";
+            if(type.indexOf("text/html")===-1){
+                this.realEnd();
+                return;
+            }
             let timeToGenerate = ((new Date().getTime()) - startTime)/1000;
             let used = process.memoryUsage();
             for(let k in used){
@@ -66,16 +71,13 @@ module.exports = {
                 }
                 content.memory[k] = formatMemory(used[k] - content.memory[k]);
             }
-            let type = this.getHeader("Content-Type")?this.getHeader("Content-Type").toLowerCase():"";
-            if(type.indexOf("text/html")!==-1){
-                let id = "'NWS '+String.fromCodePoint(0x23F1)+' "+timeToGenerate+"s   '+String.fromCodePoint(0x1F3C1)+' "+content.memory.heapUsed+"'";
-                let output = "console.group("+id+");";
-                output = content.console.reduce(function(pOutput, pEntry){
-                    return pOutput+"console."+pEntry[0]+".apply(null,"+pEntry[1]+");";
-                }, output);
-                output += "console.groupEnd("+id+");";
-                this.write("<script>"+output+"</script>", 'utf8');
-            }
+            let id = "'NWS '+String.fromCodePoint(0x23F1)+' "+timeToGenerate+"s   '+String.fromCodePoint(0x1F3C1)+' "+content.memory.heapUsed+"'";
+            let output = "console.group("+id+");";
+            output = content.console.reduce(function(pOutput, pEntry){
+                return pOutput+"console."+pEntry[0]+".apply(null,"+pEntry[1]+");";
+            }, output);
+            output += "console.groupEnd("+id+");";
+            this.write("<script>"+output+"</script>", 'utf8');
             this.realEnd();
         };
         if(ready){

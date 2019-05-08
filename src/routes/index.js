@@ -1,9 +1,9 @@
-let Template = require("../nws/tools/template/template");
+let Template = require("../nws/tools/template/Server");
 
 module.exports = {
     index:function(pRequest, pResponse){
 
-
+        /**
         let p1 = new Promise(function(pResolve, pReject){
             setTimeout(function(){
                 console.log("p1");
@@ -32,7 +32,7 @@ module.exports = {
         console.info("attention notice");
         console.warn("attention warning");
         console.error("attention error");
-        console.table([{a:"1", b:"1"}, {a:"0", b:"0", c:"0"}, {bouboup:42}, {bouboup:[1,2,3]}]);
+        console.table([{a:"1", b:"1"}, {a:"0", b:"0", c:"0"}, {bouboup:42}, {bouboup:[1,2,3]}]);*/
         var t = new Template('index.tpl');
         t.assign('test', 'bouboup');
         t.render(pResponse);

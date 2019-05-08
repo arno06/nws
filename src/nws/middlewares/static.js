@@ -1,6 +1,7 @@
-var url = require("url");
-var path = require("path");
-var fs = require("fs");
+const url = require("url");
+const path = require("path");
+const fs = require("fs");
+const http_cache = require("./http_cache");
 
 module.exports = {
     middleware:function(pRequest, pResponse){
@@ -12,9 +13,10 @@ module.exports = {
                 return;
             }
             let file = fs.readFileSync(filename, "binary");
+            http_cache.store(pRequest, pResponse);
             pResponse.writeHead(200);
             pResponse.write(file, "binary");
-            pResponse.realEnd();
+            pResponse.end();
         }
     }
 };

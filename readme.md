@@ -53,11 +53,15 @@ Todo
   * [x] Middleware architecture implementation
   * [x] Static file middleware
   * [x] Templating - server implementation of [Template](https://github.com/arno06/Template/)
+    * [x] Template Abastraction
+    * [x] Server implementation
+    * [ ] WIP - Client implementation
   * [x] Debugger - ~~Similar to the one from [php-fw](https://github.com/arno06/php-fw/)~~ Based upon browser's console
   * [x] Dynamic url parameters (`/some/route/{$with}/{$parameters}`)
+  * [x] HTTP Cache middleware
+  * [ ] WIP - Frontend components support - JS Implementation of [Dependencies](https://github.com/arno06/Dependencies/)
+  * [ ] Form component (shared between frontend and backend)
   * [ ] Performance audit
-  * [ ] Stabilize working tree
   * [ ] Databases handler
   * [ ] Authentication middleware
-  * [ ] Frontend components support - JS Implementation of [Dependencies](https://github.com/arno06/Dependencies/)
-  * [ ] Form component (shared between frontend and backend)
+  * [ ] Stabilize working tree

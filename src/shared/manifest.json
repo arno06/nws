@@ -1,0 +1,8 @@
+{
+	"Template":{
+		"javascript":[
+			"./nws/tools/template/BaseTemplate.js",
+			"./nws/tools/template/Client.js"
+		]
+	}
+}

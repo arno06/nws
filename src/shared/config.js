@@ -2,7 +2,9 @@ module.exports = {
     debug:true,
     not_found:'',
     middlewares:[
-        './middlewares/debugger',
-        './middlewares/static'
+        './middlewares/http_cache',
+        './middlewares/static',
+        './middlewares/dependencies',
+        './middlewares/debugger'
     ]
 };
