@@ -1,3 +1,4 @@
+const querystring = require('querystring');
 let routes = require("../../shared/routes");
 
 module.exports = {
@@ -20,10 +21,11 @@ module.exports = {
                 url = url.replace('{$'+n+'}', "("+params[n]+")");
                 p.push(n);
             }
+            let [request_url, query_string] = pRequest.url.split("?");
             let re = new RegExp('^'+url+'$');
-            let matches = pRequest.url.match(re);
+            let matches = request_url.match(re);
+            let query_params = !query_string?{}:querystring.parse(query_string);
             if(matches !== null){
-                let query_params = {};
                 p.forEach(function(pItem, pIndex){
                     query_params[pItem] = matches[pIndex+1];
                 });
@@ -35,11 +37,11 @@ module.exports = {
                 }else{
                     return false;
                 }
-                if(query_params.hasOwnProperty('module')){
+                if(query_params.module && r.indexOf('{$module}')!==-1){
                     r = r.replace('{$module}', query_params.module);
                     delete query_params.module;
                 }
-                if(query_params.hasOwnProperty('method')){
+                if(query_params.method && r.indexOf('{$method}')!==-1){
                     r = r.replace('{$method}', query_params.method);
                     delete query_params.method;
                 }

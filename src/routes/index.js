@@ -1,40 +1,25 @@
 let Template = require("../nws/tools/template/Server");
+let Form = require("../nws/tools/form/Server");
 
 module.exports = {
     index:function(pRequest, pResponse){
 
-        /**
-        let p1 = new Promise(function(pResolve, pReject){
-            setTimeout(function(){
-                console.log("p1");
-                pReject("nop p1 after 1s");
-            }, 1000);
-        });
+        console.log(pRequest.superbody);
 
-        let p2 = new Promise(function(pResolve, pReject){
-            setTimeout(function(){
-                console.log("p2");
-                pResolve("yes p2 after 2s");
-            }, 2000)
-        });
+        var f = new Form('test');
 
-        Promise.all([p1, p2]).then(function(v){
-            console.log("then", v);
-        }).catch(function(e){
-            console.log("catch e");
-        });
+        if(f.isValid()){
+            console.table(f.getValues());
+        }else{
+            let e = f.getError();
+            if(e){
+                console.log(e);
+            }
+        }
 
-        let o = {"test":function(){}, "foo":"bar", "num":12};
-        console.dir(o);
-
-        console.log("éèçé");
-        console.log("bouboup");
-        console.info("attention notice");
-        console.warn("attention warning");
-        console.error("attention error");
-        console.table([{a:"1", b:"1"}, {a:"0", b:"0", c:"0"}, {bouboup:42}, {bouboup:[1,2,3]}]);*/
         var t = new Template('index.tpl');
         t.assign('test', 'bouboup');
+        t.assign('form_test', f.render());
         t.render(pResponse);
     },
     bouboup:function(pRequest, pResponse){

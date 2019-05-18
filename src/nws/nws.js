@@ -16,7 +16,6 @@ class NWS{
     }
 
     run(pPort = null){
-        this.middleware(router);
         if(this.running){
             return;
         }
@@ -24,8 +23,11 @@ class NWS{
             this.port = pPort;
         }
 
+        console.log('\x1b[36m', 'NWS', '\x1b[0m','running at http://localhost:'+this.port+'/' ,'\x1b[0m');
+
         var ref = this;
         this.running = true;
+        this.middleware(router);
         http.createServer(function(pRequest, pResponse){
             try{
                 for(let i = 0, max = ref.stack.length; i<max; i++){
@@ -42,7 +44,7 @@ class NWS{
             }
             catch(e){
                 console.error(e);
-                errorHandler(e);
+                errorHandler(pResponse, e);
             }
         }).listen(this.port);
     }

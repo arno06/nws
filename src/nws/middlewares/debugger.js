@@ -5,7 +5,6 @@ let debug = true;
 let content = {};
 let ready = false;
 let startTime;
-let lastResponse;
 
 let csl = console;
 
@@ -39,11 +38,18 @@ function formatMemory(pValue){
 }
 
 module.exports = {
-    errorHandler:function(pError){
-        lastResponse.setHeader("Content-Type", "text/html;charset=UTF-8");
-        lastResponse.writeHead(500);
-        lastResponse.write("<html><body><h1>Internal server error</h1></body></html>")
-        lastResponse.end();
+    errorHandler:function(pResponse, pError){
+        pResponse.setHeader("Content-Type", "text/html;charset=UTF-8");
+        pResponse.writeHead(500);
+        if(!ready){
+            pResponse.write("<html><body><h1>Internal server error</h1></body></html>");
+        }else{
+            let s = pError.stack.split("\n");
+            s.shift();
+            let str = s.reduce((pResult, pEntry)=>pResult+"<li>"+pEntry+"</li>", "<ul>")+"</ul>";
+            pResponse.write("<html><body><h1>"+pError.message+"</h1><div>"+str+"</div></body></html>");
+        }
+        pResponse.end();
     },
     middleware:function(pRequest, pResponse){
         if(!debug){
@@ -55,7 +61,6 @@ module.exports = {
             console:[],
             memory:process.memoryUsage()
         };
-        lastResponse = pResponse;
         pResponse.realEnd = pResponse.end;
         pResponse.end = function(){
             let type = this.getHeader("Content-Type")?this.getHeader("Content-Type").toLowerCase():"";
@@ -72,10 +77,14 @@ module.exports = {
                 content.memory[k] = formatMemory(used[k] - content.memory[k]);
             }
             let id = "'NWS '+String.fromCodePoint(0x23F1)+' "+timeToGenerate+"s   '+String.fromCodePoint(0x1F3C1)+' "+content.memory.heapUsed+"'";
-            let output = "console.group("+id+");";
+            let output = "console.groupCollapsed("+id+");";
             output = content.console.reduce(function(pOutput, pEntry){
                 return pOutput+"console."+pEntry[0]+".apply(null,"+pEntry[1]+");";
             }, output);
+            output += "console.groupEnd("+id+");";
+            id = "'NWS query params :'";
+            output += "console.groupCollapsed("+id+");";
+            output += "console.table.apply(null, ["+JSON.stringify(pRequest.query_params)+"]);";
             output += "console.groupEnd("+id+");";
             this.write("<script>"+output+"</script>", 'utf8');
             this.realEnd();

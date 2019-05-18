@@ -1,6 +1,6 @@
 module.exports = {
     "/":{
-        "GET":"index.index"
+        "*":"index.index"
     },
     "/bouboup":{
         "GET":"index.bouboup"
