@@ -1,6 +1,8 @@
 const crypto = require("crypto");
+const path = require("path");
+const config = require(path.join(process.cwd(), "shared", "config"));
 
-let cacheDuration = 120;
+let cacheDuration = config.http_cache&&config.http_cache.duration?config.http_cache.duration:120;
 
 function getEtag(pUrl){
     return '"'+crypto.createHash('sha1').update(pUrl).digest('hex')+'"';
