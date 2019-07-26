@@ -10,20 +10,25 @@ function getEtag(pUrl){
 
 module.exports = {
     middleware:function(pRequest, pResponse){
-        let ifNoneMatch = pRequest.headers["if-none-match"]||null;
-        let ifModifiedSince = pRequest.headers['if-modified-since']||null;
-        if(!ifNoneMatch||!ifModifiedSince){
-            return;
-        }
-        let eTag = getEtag(pRequest.url);
-        let time = Date.parse(ifModifiedSince) + (cacheDuration * 1000);
+        return new Promise(function(pResolve, pReject){
+            let ifNoneMatch = pRequest.headers["if-none-match"]||null;
+            let ifModifiedSince = pRequest.headers['if-modified-since']||null;
+            if(!ifNoneMatch||!ifModifiedSince){
+                pReject();
+                return;
+            }
+            let eTag = getEtag(pRequest.url);
+            let time = Date.parse(ifModifiedSince) + (cacheDuration * 1000);
 
-        if(eTag !== ifNoneMatch || (new Date()).getTime() > time){
-            return;
-        }
+            if(eTag !== ifNoneMatch || (new Date()).getTime() > time){
+                pReject();
+                return;
+            }
 
-        pResponse.writeHead(304);
-        pResponse.end();
+            pResponse.writeHead(304);
+            pResponse.end();
+            pResolve();
+        });
     },
     store:function(pRequest, pResponse){
         pResponse.setHeader("Cache-Control", "max-age="+cacheDuration+", public");

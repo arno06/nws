@@ -9,10 +9,30 @@ class NWS{
         this.running = false;
         this.port = 1234;
         this.stack = config.middlewares.map((pModule)=> require(pModule).middleware);
+        this.currentMiddleware = 0;
     }
 
     middleware(pMiddleware){
         this.stack.push(pMiddleware);
+    }
+
+    nextMiddleware(pRequest, pResponse){
+        var ref = this;
+        if(this.currentMiddleware>this.stack.length-1){
+            pResponse.writeHead(404);
+            pResponse.write("Page not found");
+            pResponse.end();
+            return;
+        }
+        this.stack[this.currentMiddleware++](pRequest, pResponse).then(function(){
+            if(!pResponse.finished){
+                pResponse.writeHead(404);
+                pResponse.write("Page not found");
+                pResponse.end();
+            }
+        }, function(){
+            ref.nextMiddleware(pRequest, pResponse);
+        });
     }
 
     run(pPort = null){
@@ -29,18 +49,9 @@ class NWS{
         this.running = true;
         this.middleware(router);
         http.createServer(function(pRequest, pResponse){
+            ref.currentMiddleware = 0;
             try{
-                for(let i = 0, max = ref.stack.length; i<max; i++){
-                    ref.stack[i](pRequest, pResponse);
-                    if(pResponse.finished){
-                        return;
-                    }
-                }
-                if(!pResponse.finished){
-                    pResponse.writeHead(404);
-                    pResponse.write("Page not found");
-                    pResponse.end();
-                }
+                ref.nextMiddleware(pRequest, pResponse);
             }
             catch(e){
                 console.error(e);

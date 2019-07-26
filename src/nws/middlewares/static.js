@@ -5,11 +5,16 @@ const http_cache = require("./http_cache");
 
 module.exports = {
     middleware:function(pRequest, pResponse){
-        let uri = url.parse(pRequest.url).pathname;
-        let filename = path.join(process.cwd(), '..', 'public', uri);
-        if(fs.existsSync(filename)){
+        return new Promise(function(pResolve, pReject){
+            let uri = url.parse(pRequest.url).pathname;
+            let filename = path.join(process.cwd(), '..', 'public', uri);
+            if(!fs.existsSync(filename)) {
+                pReject();
+                return;
+            }
             let stats = fs.statSync(filename);
             if(!stats.isFile()){
+                pReject();
                 return;
             }
             let file = fs.readFileSync(filename, "binary");
@@ -17,6 +22,7 @@ module.exports = {
             pResponse.writeHead(200);
             pResponse.write(file, "binary");
             pResponse.end();
-        }
+            pResolve();
+        });
     }
 };

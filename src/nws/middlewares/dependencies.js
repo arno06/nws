@@ -22,42 +22,47 @@ let output;
 
 module.exports = {
     middleware:function(pRequest, pResponse){
-        if(pRequest.url.indexOf("/dependencies?")!==0){
-            return;
-        }
-        let qstring = pRequest.url.split("?")[1];
-        let params = querystring.parse(qstring);
-        if(!params.need){
-            return;
-        }
-
-        http_cache.store(pRequest, pResponse);
-
-        let needs = params.need.split(",");
-        let type = params.type||"javascript";
-
-        output = "";
-        let entries = [];
-        calculateNeed(needs, entries);
-
-        for(let i = 0, max = entries.length; i<max;i++){
-            let name = entries[i];
-            let cpt = dependencies[name];
-            if(!cpt.hasOwnProperty(type)){
-                continue;
+        return new Promise(function(pResolve, pReject){
+            if(pRequest.url.indexOf("/dependencies?")!==0){
+                pReject();
+                return;
             }
-            let files = cpt[type];
-            for(let j = 0, maxj = files.length; j<maxj; j++){
-                let f = files[j];
-                if(!fs.existsSync(f)){
+            let qstring = pRequest.url.split("?")[1];
+            let params = querystring.parse(qstring);
+            if(!params.need){
+                pReject();
+                return;
+            }
+
+            http_cache.store(pRequest, pResponse);
+
+            let needs = params.need.split(",");
+            let type = params.type||"javascript";
+
+            output = "";
+            let entries = [];
+            calculateNeed(needs, entries);
+
+            for(let i = 0, max = entries.length; i<max;i++){
+                let name = entries[i];
+                let cpt = dependencies[name];
+                if(!cpt.hasOwnProperty(type)){
                     continue;
                 }
-                output += fs.readFileSync(f, "utf8");
+                let files = cpt[type];
+                for(let j = 0, maxj = files.length; j<maxj; j++){
+                    let f = files[j];
+                    if(!fs.existsSync(f)){
+                        continue;
+                    }
+                    output += fs.readFileSync(f, "utf8");
+                }
             }
-        }
-        pResponse.setHeader("Content-Type", "application/javascript");
-        pResponse.writeHead(200);
-        pResponse.write(output);
-        pResponse.end();
+            pResponse.setHeader("Content-Type", "application/javascript");
+            pResponse.writeHead(200);
+            pResponse.write(output);
+            pResponse.end();
+            pResolve();
+        });
     }
 };
