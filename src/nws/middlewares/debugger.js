@@ -54,7 +54,6 @@ module.exports = {
     middleware:function(pRequest, pResponse){
         return new Promise(function(pResolve, pReject){
             if(!debug){
-                csl.log("!debugger");
                 pReject();
                 return;
             }
@@ -101,12 +100,11 @@ module.exports = {
             let excepts = ['table', 'dir'];
             let preCss = "font-size:11px;color:#888;";
             let valCss = "font-size:12px;color:#000;";
-            ['info','warn', 'error', 'table', 'dir'].forEach(function(pMethod){
+            ['info','warn', 'error', 'table', 'dir', 'log'].forEach(function(pMethod){
                 let cb = csl[pMethod];
                 console[pMethod] = function(){
                     let e = pMethod==="error"&&typeof arguments[0]!=="string"?arguments[0]:null;
                     let f = getStackFile(e);
-                    csl.log(f);
                     if(f.indexOf("console.js:")===-1&&f.indexOf("/console/constructor.js")===-1){//internal callings (ie : console.table calling console.log)
                         let arg = Array.from(arguments);
                         let d = new Date();
@@ -123,9 +121,8 @@ module.exports = {
                         content.console.push([pMethod, JSON.stringify(arg)]);
                     }
                     cb(...arguments);
-                }
+                };
             });
-            csl.log("debugger reject");
             pReject();
         });
     }
