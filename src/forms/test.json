@@ -1,0 +1,25 @@
+{
+	"input":{
+		"tag":"input",
+		"label":"Input type text",
+		"regExp":"Text",
+		"require":true,
+		"attributes":{
+			"type":"text"
+		}
+	},
+	"textarea":{
+		"tag":"textarea",
+		"label":"Textarea",
+		"regExp":"TextNoHtml",
+		"require":true
+	},
+	"submit":{
+		"tag":"input",
+		"attributes":{
+			"type":"submit",
+			"value":"Envoyer",
+			"class":"button"
+		}
+	}
+}

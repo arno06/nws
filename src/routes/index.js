@@ -4,11 +4,9 @@ let Form = require("../nws/tools/form/Server");
 module.exports = {
     index:function(pRequest, pResponse){
 
-        console.log(pRequest.superbody);
-
         var f = new Form('test');
 
-        if(f.isValid()){
+        if(f.isValid(pRequest)){
             console.table(f.getValues());
         }else{
             let e = f.getError();

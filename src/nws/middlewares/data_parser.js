@@ -15,7 +15,28 @@ module.exports = {
                 }
             });
             pRequest.on("end", function(){
-                pRequest.superbody = body;
+                let data = {};
+                switch(pRequest.headers['content-type']){
+                    case "application/x-www-form-urlencoded":
+                        let entries = body.replace(/\+/g, '%20').split('&').map(decodeURIComponent);
+                        entries.forEach(function(pItem){
+                            let s = pItem.split('=');
+                            let names = s[0].match(/[^\]\[]+/g);
+                            let t = data;
+                            names.forEach(function(pItem, pIndex){
+                                if(!t[pItem]){
+                                    t[pItem] = {};
+                                }
+                                if(pIndex === names.length-1){
+                                    t[pItem] = s[1];
+                                }else{
+                                    t = t[pItem];
+                                }
+                            });
+                        });
+                        break;
+                }
+                pRequest[pRequest.method.toLowerCase()] = data;
                 pReject();
             });
         });
